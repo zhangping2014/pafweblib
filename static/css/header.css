@@ -1,0 +1,57 @@
+/**
+ * @Description: header style
+ * @Author: xujia(2014-02-28 10:24)
+ */
+/*reset*/
+.header ul{
+    padding: 0;
+    margin: 0;
+}
+.header li{
+    list-style: none;
+}
+.header{
+    height: 60px;
+    font-size: 20px;
+    background: #fff;
+    color: #157fcc;
+}
+.header .logo{
+    display: inline-block;
+    width: 300px;
+    vertical-align: top;
+    padding: 0 12px;
+}
+.header .logo a{
+    display: block;
+    width: 100%;
+    height: 60px;
+    text-indent: -999px;
+    background: url(../img/public/logo/logo1.png) no-repeat center;
+}
+.header .nav{
+    display: inline-block;
+    height: 100%;
+    margin-left: 12px
+}
+.header .nav li{
+    float: left;
+}
+.header .nav a{
+    display: inline-block;
+    height: 60px;
+    line-height: 60px;
+    color: #157fcc;
+    text-decoration: none;
+    padding: 0 32px;
+    outline: 0px;
+    transition: background .1s linear;
+}
+.header .nav a:hover {
+    background: #157fcc;
+    color: #fff;
+}
+.header .nav a.active{
+    background: #3892d3;
+    color: #fff;
+}

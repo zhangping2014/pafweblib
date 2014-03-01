@@ -1,0 +1,22 @@
+# common
+dist
+.tmp
+.sass-cache
+
+# nodejs
+node_modules
+
+# bower
+bower_components
+
+# maven
+target
+
+# idea
+*.iml
+.idea
+.DS_Store
+
+# my test file
+static/js/doc.js
+static/js/app-debug.js

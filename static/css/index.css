@@ -1,0 +1,26 @@
+body{
+    padding: 0;
+    margin: 0;
+    background: #f0f0f0;
+    font-size: 14px;
+}
+
+.apiTreepanel{
+    font-size: 16px;
+}
+.apiTreepanel .x-tree-node-text{
+    color: #157fcc;
+}
+.apiTreepanel .x-grid-row *{
+    cursor: pointer;
+}
+
+#pagePanel-body .x-panel-body{
+    /*border-width: 0px;*/
+}
+
+iframe {
+    border: 0 none;
+    width: 100%;
+    height: 100%;
+}
