@@ -4,9 +4,9 @@
  */
 var PafWebLib = PafWebLib || {};
 PafWebLib.TREEDATA = [
-    { "id": "home", "href": "docs/home.html", "text": "Home", "leaf": true },
+    { "id": "home", "url": "docs/home.html", "text": "Home", "leaf": true },
     { "id": "css", "text": "CSS", expanded: false, children: [
-        { id:"css.reset", text: "reset", "href" : "docs/css/css.reset.html", leaf: true },
-        { id:"css.grid", text: "grid", "href" : "docs/css/css.grid.html", leaf: true}
+        { id:"css.reset", text: "reset", "url" : "docs/css/css.reset.html", leaf: true },
+        { id:"css.grid", text: "grid", "url" : "docs/css/css.grid.html", leaf: true}
     ]}
 ]

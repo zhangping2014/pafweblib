@@ -66,7 +66,7 @@
                         id: id,
                         title: data.text,
                         closable:true,
-                        html: Ext.String.format('<iframe frameborder="0" src="{0}?t={1}"></iframe>', data.href, new Date().valueOf())
+                        html: Ext.String.format('<iframe frameborder="0" src="{0}?t={1}"></iframe>', data.url, new Date().valueOf())
                     });
                     pageTabPanel.add(tmpPanel);
                     pageTabPanel.setActiveTab(tmpPanel)
@@ -86,6 +86,7 @@
             this.callParent([{
                 id: 'apiTreepanel',
                 region: 'center',
+                layout: '',
                 header: false,
                 store: Ext.create('Ext.data.TreeStore', {
                     root: {
@@ -93,44 +94,40 @@
                         children: PafWebLib.TREEDATA
                     }
                 }),
-//                tbar: [' ', new Ext.app.FilterField({
-//                    id: 'txtFilter',
-//                    emptyText: 'Keywords...',
-//                    enableKeyEvents: true,
-//                    listeners: {
-//                        render: function(f){
-//                            this.filter = new Ext.tree.TreeFilter(this, {
-//                                clearBlank: true,
-//                                autoClear: true
-//                            });
-//                        },
-//                        keydown: {
-//                            fn: this.filterTree,
-//                            buffer: 350,
-//                            scope: this
-//                        },
-//                        scope: this
-//                    }
-//                }), '->', {
-//                    iconCls: 'icon-expand-all',
-//                    tooltip: 'Expand All',
-//                    handler: function(){
-//                        this.root.expand(true);
-//                    },
-//                    scope: this
-//                }, '-', {
-//                    iconCls: 'icon-collapse-all',
-//                    tooltip: 'Collapse All',
-//                    handler: function(){
-//                        this.root.collapse(true);
-//                    },
-//                    scope: this
-//                }],
-//                bbar: [' ', new Ext.form.Checkbox({
-//                    id: 'cbxTabs',
-//                    checked: true,
-//                    boxLabel: '启用标签浏览'
-//                })],
+                bodyStyle:'background:#f3f3f3',
+                tbar: [{
+                    width: 100,
+                    xtype: 'textfield',
+                    name: 'keyword',
+                    bodyStyle: {
+                        background: '#ffc',
+                        padding: '10px'
+                    },
+                    allowBlank: false  // requires a non-empty value
+                }, '->', {
+                    iconCls: 'icon-expand-all',
+                    tooltip: 'Expand All',
+                    handler: function(){
+                        this.root.expand(true);
+                    },
+                    scope: this
+                }, '-', {
+                    iconCls: 'icon-collapse-all',
+                    tooltip: 'Collapse All',
+                    handler: function(){
+                        this.root.collapse(true);
+                    },
+                    scope: this
+                }],
+                bbar: [' ', new Ext.form.Checkbox({
+                    id: 'cbxTabs',
+                    checked: true,
+                    bodyStyle: {
+                        background: '#ffc',
+                        padding: '10px'
+                    },
+                    boxLabel: '启用标签浏览'
+                })],
                 rootVisible: false,
                 border: false,
                 autoScroll: true,
@@ -158,11 +155,11 @@
             this.callParent([{
                 id: 'pagePanel',
                 region: 'center',
+                bodyStyle:'background:#f3f3f3',
                 margins: '4 4 4 0',
                 resizeTabs: true,
                 minTabWidth: 135,
                 tabWidth: 135,
-                border: false,
                 bodyBorder: false
             }]);
         },
@@ -177,7 +174,11 @@
     /*
      * 扩展过滤框
      */
-    /*PafWebLib.FilterField = Ext.extend(Ext.form.TriggerField, {
+    Ext.define("PageFilterField", {
+        extend: Ext.form.TriggerFiled
+    });
+
+    PafWebLib.FilterField = Ext.extend(Ext.form.TriggerField, {
         initComponent: function(){
             Ext.app.FilterField.superclass.initComponent.call(this);
         },
@@ -192,7 +193,7 @@
             this.focus();
             this.fireEvent('keydown', this);
         }
-    });*/
+    });
 
 
     Ext.onReady(function () {
