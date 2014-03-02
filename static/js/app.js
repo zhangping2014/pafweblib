@@ -8,6 +8,59 @@
     // 页面标签面板
     var pageTabPanel = null;
 
+    /**
+     * Add basic filtering to Ext.tree.Panel. Add as a mixin:
+     *  mixins: {
+ *      treeFilter: 'WMS.view.TreeFilter'
+ *  }
+     */
+    Ext.define('PageTreeFilter', {
+        filterByText: function(text) {
+            this.filterBy(text, 'text');
+        },
+        /**
+         * Filter the tree on a string, hiding all nodes expect those which match and their parents.
+         * @param The term to filter on.
+         * @param The field to filter on (i.e. 'text').
+         */
+        filterBy: function(text, by) {
+            this.clearFilter();
+            var view = this.getView(),
+                me = this,
+                nodesAndParents = [];
+            // Find the nodes which match the search term, expand them.
+            // Then add them and their parents to nodesAndParents.
+            this.getRootNode().cascadeBy(function(tree, view){
+                var currNode = this;
+
+                if(currNode && currNode.data[by] && currNode.data[by].toString().toLowerCase().indexOf(text.toLowerCase()) > -1) {
+                    me.expandPath(currNode.getPath());
+                    while(currNode.parentNode) {
+                        nodesAndParents.push(currNode.id);
+                        currNode = currNode.parentNode;
+                    }
+                }
+            }, null, [me, view]);
+            // Hide all of the nodes which aren't in nodesAndParents
+            this.getRootNode().cascadeBy(function(tree, view){
+                var uiNode = view.getNodeByRecord(this);
+                if(uiNode && !Ext.Array.contains(nodesAndParents, this.id)) {
+                    Ext.get(uiNode).setDisplayed('none');
+                }
+            }, null, [me, view]);
+        },
+        clearFilter: function() {
+            var view = this.getView();
+            this.getRootNode().cascadeBy(function(tree, view){
+                var uiNode = view.getNodeByRecord(this);
+                if(uiNode) {
+                    Ext.get(uiNode).setDisplayed('table-row');
+                }
+            }, null, [this, view]);
+        }
+    });
+
+
     /*
      * 定义平安付web系统类
      * */
@@ -92,6 +145,10 @@
      * */
     Ext.define('pageTreePanel', {
         extend: 'Ext.tree.Panel',
+        //这里不要忘记
+        mixins: {
+            treeFilter: 'PageTreeFilter'
+        },
         constructor: function (config) {
             config = config || {};
             // calls Ext.tree.Panel's constructor
@@ -99,7 +156,7 @@
                 id: 'apiTreepanel',
                 region: 'center',
                 layout: '',
-                header: false,
+                title: "资源导航",
                 store: Ext.create('Ext.data.TreeStore', {
                     root: {
                         expanded: true,
@@ -107,8 +164,9 @@
                     }
                 }),
                 bodyStyle:'background:#f3f3f3',
+
                 tbar: [
-                    Ext.create("FilterTextField"),
+                    Ext.create("TriggerField"),
                         '->', {
                         iconCls: 'icon-expand-all',
                         tooltip: 'Expand All',
@@ -141,19 +199,6 @@
                 renderTo: Ext.getBody(),
                 collapseFirst: false
             }]);
-        },
-        /*
-         * 初始化组件
-         */
-        initComponent: function(){
-            this.hiddenPkgs = [];
-            this.callParent();
-        },
-        /*
-         * 关键字过滤树结构
-         */
-        fiterTree: function(){
-
         }
     });
 
@@ -178,28 +223,28 @@
         }
     });
 
+
+
     /*
      * 过滤输入框类
      */
-    Ext.define('FilterTextField', {
-        extend: 'Ext.form.field.Text',
-        constructor: function(){
-            this.callParent({
-                width: 100,
-                name: 'filterTextField',
-                emptyText:'可过滤节点',
-                bodyStyle: {
-                    background: '#ffc',
-                    padding: '10px'
-                }
-            });
+    Ext.define('TriggerField', {
+        extend: 'Ext.form.field.Trigger',
+        triggerCls: 'x-form-clear-trigger',
+        onTriggerClick: function () {
+            this.setValue('');
+            Ext.getCmp("apiTreepanel").clearFilter();
         },
+        width:'100',
+        emptyText:'快速检索功能',
+        enableKeyEvents: true,
         listeners: {
-            keydown: {
-                element: 'el', //bind to the underlying el property on the panel
-                fn: function(e, target){
-                    if(!pageTreePanel){
-                        return false;
+            keyup: {
+                fn: function (field, e) {
+                    if (Ext.EventObject.ESC == e.getKey()) {
+                        field.onTriggerClick();
+                    } else {
+                        Ext.getCmp("apiTreepanel").filterByText(this.getRawValue());
                     }
                 }
             }
