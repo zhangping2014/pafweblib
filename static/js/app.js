@@ -49,17 +49,29 @@
         bindEvents: function(){
             var me = this;
             me.pageTreePanel.on('itemclick', function(view, record, item, index, e){
-                var data = record.raw;
-                if(data.href){
-                    me.pageTabPanel.add(Ext.create('Ext.tab.Panel',{
-                        title: "test",
-                        closable:true,
-                        html: Ext.String.format('<iframe frameborder="0" src="{0}?t={1}"></iframe>', data.href, new Date().valueOf())
-                    }));
-                }
-                // todo 判断是否已存在改tab
+                me.loadPage.apply(me, arguments);
+                // todo 判断是否已存在该tab
                 e.stopEvent();
             });
+        },
+        loadPage: function(view, record, item, index){
+            var me = this, data = record.raw , id = "paf-" + data.id, pageTabPanel = me.pageTabPanel,
+                tabPanel = pageTabPanel.getComponent(id), url = window.location.href.split('#')[0];
+            window.location.href = url + '#' + data.id;
+            if(tabPanel){
+                pageTabPanel.setActiveTab(tabPanel);
+            }else{
+                if(data.leaf){
+                    var tmpPanel = Ext.create('Ext.panel.Panel',{
+                        id: id,
+                        title: data.text,
+                        closable:true,
+                        html: Ext.String.format('<iframe frameborder="0" src="{0}?t={1}"></iframe>', data.href, new Date().valueOf())
+                    });
+                    pageTabPanel.add(tmpPanel);
+                    pageTabPanel.setActiveTab(tmpPanel)
+                }
+            }
         }
     });
 
@@ -193,7 +205,6 @@
             pageTreePanel: pageTreePanel,
             pageTabPanel: pageTabPanel
         });
-
     });
 }();
 
