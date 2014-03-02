@@ -11,23 +11,31 @@
     list-style: none;
 }
 .header{
-    height: 60px;
     font-size: 20px;
-    background: #fff;
-    color: #157fcc;
+    color: #333;
+    padding-top: 4px;
+    background-color: #fa9c66;
+}
+.header .inner{
+    height: 56px;
+    background: #e8e8e8;
+    background: -webkit-gradient(linear,left top,left bottom,from(#f4f4f4),to(#e8e8e8));
+    background: -moz-linear-gradient(top,#f4f4f4,#e8e8e8);
+    /*-webkit-box-shadow: 3px 6px 12px #aaa;
+    -moz-box-shadow: 3px 6px 12px #aaa;
+    box-shadow: 3px 6px 12px #eee;*/
 }
 .header .logo{
     display: inline-block;
-    width: 300px;
     vertical-align: top;
     padding: 0 12px;
 }
 .header .logo a{
     display: block;
-    width: 100%;
+    width: 300px;
     height: 60px;
     text-indent: -999px;
-    background: url(../img/public/logo/logo1.png) no-repeat center;
+    background: url(../img/logo/logo.png) no-repeat center;
 }
 .header .nav{
     display: inline-block;
@@ -39,19 +47,20 @@
 }
 .header .nav a{
     display: inline-block;
-    height: 60px;
-    line-height: 60px;
-    color: #157fcc;
+    height: 56px;
+    line-height: 56px;
     text-decoration: none;
     padding: 0 32px;
     outline: 0px;
+    color: #000;
     transition: background .1s linear;
 }
 .header .nav a:hover {
-    background: #157fcc;
+    background: #fa9c66;
     color: #fff;
+    opacity: 0.8;
 }
 .header .nav a.active{
-    background: #3892d3;
+    background: #fa9c66;
     color: #fff;
 }

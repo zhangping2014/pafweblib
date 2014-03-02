@@ -3,6 +3,64 @@
  * @Author: xujia(2014-02-27 21:41)
  */
 !function(){
+    // 左侧树型面板
+    var pageTreePanel =  null;
+    // 页面标签面板
+    var pageTabPanel = null;
+
+    /**
+     * Add basic filtering to Ext.tree.Panel. Add as a mixin:
+     *  mixins: {
+ *      treeFilter: 'WMS.view.TreeFilter'
+ *  }
+     */
+    Ext.define('PageTreeFilter', {
+        filterByText: function(text) {
+            this.filterBy(text, 'text');
+        },
+        /**
+         * Filter the tree on a string, hiding all nodes expect those which match and their parents.
+         * @param The term to filter on.
+         * @param The field to filter on (i.e. 'text').
+         */
+        filterBy: function(text, by) {
+            this.clearFilter();
+            var view = this.getView(),
+                me = this,
+                nodesAndParents = [];
+            // Find the nodes which match the search term, expand them.
+            // Then add them and their parents to nodesAndParents.
+            this.getRootNode().cascadeBy(function(tree, view){
+                var currNode = this;
+
+                if(currNode && currNode.data[by] && currNode.data[by].toString().toLowerCase().indexOf(text.toLowerCase()) > -1) {
+                    me.expandPath(currNode.getPath());
+                    while(currNode.parentNode) {
+                        nodesAndParents.push(currNode.id);
+                        currNode = currNode.parentNode;
+                    }
+                }
+            }, null, [me, view]);
+            // Hide all of the nodes which aren't in nodesAndParents
+            this.getRootNode().cascadeBy(function(tree, view){
+                var uiNode = view.getNodeByRecord(this);
+                if(uiNode && !Ext.Array.contains(nodesAndParents, this.id)) {
+                    Ext.get(uiNode).setDisplayed('none');
+                }
+            }, null, [me, view]);
+        },
+        clearFilter: function() {
+            var view = this.getView();
+            this.getRootNode().cascadeBy(function(tree, view){
+                var uiNode = view.getNodeByRecord(this);
+                if(uiNode) {
+                    Ext.get(uiNode).setDisplayed('table-row');
+                }
+            }, null, [this, view]);
+        }
+    });
+
+
     /*
      * 定义平安付web系统类
      * */
@@ -49,17 +107,36 @@
         bindEvents: function(){
             var me = this;
             me.pageTreePanel.on('itemclick', function(view, record, item, index, e){
-                var data = record.raw;
-                if(data.href){
-                    me.pageTabPanel.add(Ext.create('Ext.tab.Panel',{
-                        title: "test",
-                        closable:true,
-                        html: Ext.String.format('<iframe frameborder="0" src="{0}?t={1}"></iframe>', data.href, new Date().valueOf())
-                    }));
-                }
-                // todo 判断是否已存在改tab
+                me.loadPage.apply(me, arguments);
                 e.stopEvent();
             });
+        },
+        loadPage: function(view, record, item, index){
+            var me = this, data = record.raw ,
+                cbxTabs = Ext.getCmp('cbxTabs'), isTabs = cbxTabs.getValue(),
+                id = "paf-" + data.id, pageTabPanel = me.pageTabPanel,
+                tabPanel = pageTabPanel.getComponent(id), url = window.location.href.split('#')[0];
+            window.location.href = url + '#' + data.id;
+
+            // 判断是否已存在该tab
+            if(tabPanel){
+                pageTabPanel.setActiveTab(tabPanel);
+            }else{
+                // 启用标签浏览
+                if(data.leaf && !isTabs){
+                    pageTabPanel.removeAll();
+                }
+                if(data.leaf){
+                    var tmpPanel = Ext.create('Ext.panel.Panel',{
+                        id: id,
+                        title: data.text,
+                        closable:true,
+                        html: Ext.String.format('<iframe frameborder="0" src="{0}?t={1}"></iframe>', data.url, new Date().valueOf())
+                    });
+                    pageTabPanel.add(tmpPanel);
+                    pageTabPanel.setActiveTab(tmpPanel)
+                }
+            }
         }
     });
 
@@ -68,70 +145,60 @@
      * */
     Ext.define('pageTreePanel', {
         extend: 'Ext.tree.Panel',
+        //这里不要忘记
+        mixins: {
+            treeFilter: 'PageTreeFilter'
+        },
         constructor: function (config) {
             config = config || {};
             // calls Ext.tree.Panel's constructor
             this.callParent([{
                 id: 'apiTreepanel',
                 region: 'center',
-                header: false,
+                layout: '',
+                title: "资源导航",
                 store: Ext.create('Ext.data.TreeStore', {
                     root: {
                         expanded: true,
                         children: PafWebLib.TREEDATA
                     }
                 }),
-//                tbar: [' ', new Ext.app.FilterField({
-//                    id: 'txtFilter',
-//                    emptyText: 'Keywords...',
-//                    enableKeyEvents: true,
-//                    listeners: {
-//                        render: function(f){
-//                            this.filter = new Ext.tree.TreeFilter(this, {
-//                                clearBlank: true,
-//                                autoClear: true
-//                            });
-//                        },
-//                        keydown: {
-//                            fn: this.filterTree,
-//                            buffer: 350,
-//                            scope: this
-//                        },
-//                        scope: this
-//                    }
-//                }), '->', {
-//                    iconCls: 'icon-expand-all',
-//                    tooltip: 'Expand All',
-//                    handler: function(){
-//                        this.root.expand(true);
-//                    },
-//                    scope: this
-//                }, '-', {
-//                    iconCls: 'icon-collapse-all',
-//                    tooltip: 'Collapse All',
-//                    handler: function(){
-//                        this.root.collapse(true);
-//                    },
-//                    scope: this
-//                }],
-//                bbar: [' ', new Ext.form.Checkbox({
-//                    id: 'cbxTabs',
-//                    checked: true,
-//                    boxLabel: '启用标签浏览'
-//                })],
+                bodyStyle:'background:#f3f3f3',
+
+                tbar: [
+                    Ext.create("TriggerField"),
+                        '->', {
+                        iconCls: 'icon-expand-all',
+                        tooltip: 'Expand All',
+                        handler: function(){
+                            this.expandAll();
+                        },
+                        scope: this
+                    }, '-', {
+                        iconCls: 'icon-collapse-all',
+                        tooltip: 'Collapse All',
+                        handler: function(){
+                            this.collapseAll();
+                        },
+                        scope: this
+                    }
+                ],
+                bbar: [' ', new Ext.form.Checkbox({
+                        id: 'cbxTabs',
+                        checked: true,
+                        bodyStyle: {
+                            background: '#ffc',
+                            padding: '10px'
+                        },
+                        boxLabel: '启用标签浏览'
+                    })
+                ],
                 rootVisible: false,
                 border: false,
                 autoScroll: true,
                 renderTo: Ext.getBody(),
                 collapseFirst: false
             }]);
-        },
-        /*
-         * 初始化组件
-         */
-        initComponent: function(){
-            this.hiddenPkgs = [];
-            this.callParent();
         }
     });
 
@@ -146,54 +213,54 @@
             this.callParent([{
                 id: 'pagePanel',
                 region: 'center',
+                bodyStyle:'background:#f3f3f3',
                 margins: '4 4 4 0',
                 resizeTabs: true,
                 minTabWidth: 135,
                 tabWidth: 135,
-                border: false,
                 bodyBorder: false
             }]);
-        },
-        /*
-         * 初始化组件
-         */
-        initComponent: function(){
-            this.callParent();
         }
     });
 
+
+
     /*
-     * 扩展过滤框
+     * 过滤输入框类
      */
-    /*PafWebLib.FilterField = Ext.extend(Ext.form.TriggerField, {
-        initComponent: function(){
-            Ext.app.FilterField.superclass.initComponent.call(this);
+    Ext.define('TriggerField', {
+        extend: 'Ext.form.field.Trigger',
+        triggerCls: 'x-form-clear-trigger',
+        onTriggerClick: function () {
+            this.setValue('');
+            Ext.getCmp("apiTreepanel").clearFilter();
         },
-        triggerClass: 'x-form-clear-trigger',
-        hideTrigger: true,
-        validationEvent: false,
-        validateOnBlur: false,
-
-        onTriggerClick: function(){
-            this.el.dom.value = '';
-            this.trigger.hide();
-            this.focus();
-            this.fireEvent('keydown', this);
+        width:'100',
+        emptyText:'快速检索功能',
+        enableKeyEvents: true,
+        listeners: {
+            keyup: {
+                fn: function (field, e) {
+                    if (Ext.EventObject.ESC == e.getKey()) {
+                        field.onTriggerClick();
+                    } else {
+                        Ext.getCmp("apiTreepanel").filterByText(this.getRawValue());
+                    }
+                }
+            }
         }
-    });*/
-
+    });
 
     Ext.onReady(function () {
         // 初始化左侧树型面板
-        var pageTreePanel =  Ext.create('pageTreePanel');
+        pageTreePanel =  Ext.create('pageTreePanel');
         // 初始化页面标签面板
-        var pageTabPanel = Ext.create('PageTabPanel');
+        pageTabPanel = Ext.create('PageTabPanel');
         // 初始化平安付web系统
         var pafWebLibSys = Ext.create('PafWebLibSys', {
             pageTreePanel: pageTreePanel,
             pageTabPanel: pageTabPanel
         });
-
     });
 }();
 

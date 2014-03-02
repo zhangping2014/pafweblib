@@ -1,23 +1,129 @@
 body{
     padding: 0;
     margin: 0;
-    background: #f0f0f0;
     font-size: 14px;
+    background-color: #f0f0f0;
 }
 
-.apiTreepanel{
+.x-border-layout-ct{
+    background: #e8e8e8;
+}
+
+#apiTreepanel{
     font-size: 16px;
 }
-.apiTreepanel .x-tree-node-text{
-    color: #157fcc;
-}
-.apiTreepanel .x-grid-row *{
+#apiTreepanel .x-grid-row *{
     cursor: pointer;
 }
 
-#pagePanel-body .x-panel-body{
-    /*border-width: 0px;*/
+#apiTreepanel .x-grid-cell{
+    background-color: transparent;
 }
+
+
+.x-tab-bar-default-top {
+    background-image: none;
+    background-color: #d8d8d8;
+    background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0%,#e6e6e6),color-stop(100%,#efefef));
+    background-image: -webkit-linear-gradient(top,#e6e6e6,#efefef);
+    background-image: -moz-linear-gradient(top,#e6e6e6,#efefef);
+    background-image: -o-linear-gradient(top,#e6e6e6,#efefef);
+    background-image: linear-gradient(top,#e6e6e6,#efefef);
+}
+
+
+
+
+.icon-home {
+    background-image: url(../img/icon/home.png) !important;
+}
+
+.icon-expand-all {
+    background-image: url(../img/icon/expand-all.gif) !important;
+}
+
+.icon-collapse-all {
+    background-image: url(../img/icon/collapse-all.gif) !important;
+}
+
+.icon-cls {
+    background-image: url(../img/icon/class.gif) !important;
+}
+
+.icon-cmp {
+    background-image: url(../img/icon/cmp.gif) !important;
+}
+
+.icon-new {
+    background-image: url(../img/icon/new.png) !important;
+}
+
+.icon-static {
+    background-image: url(../img/icon/static.gif) !important;
+}
+
+.icon-pkg {
+    background-image: url(../img/icon/pkg.gif) !important;
+}
+
+.icon-fav {
+    background-image: url(../img/icon/fav.gif) !important;
+}
+
+.icon-js {
+    background-image: url(../img/icon/js.png) !important;
+}
+
+.icon-html {
+    background-image: url(../img/icon/html.png) !important;
+}
+
+.icon-css {
+    background-image: url(../img/icon/css.png) !important;
+}
+
+.icon-tools {
+    background-image: url(../img/icon/tools.png) !important;
+}
+
+.icon-chart {
+    background-image: url(../img/icon/chart.png) !important;
+}
+
+.icon-txt {
+    background-image: url(../img/icon/txt.png) !important;
+}
+
+#loading {
+    position: absolute;
+    width: 180px;
+    margin: -70px 0 0 -90px;
+    height: 140px;
+    top: 50%;
+    left: 50%;
+}
+
+#loading .title {
+    position: absolute;
+    display: block;
+    top: 110px;
+    left: 0px;
+    width: 180px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+}
+
+#loading .logo {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 25px;
+    width: 120px;
+    height: 120px;
+    background: url(../img/icon/loading.gif) no-repeat;
+}
+
 
 iframe {
     border: 0 none;
