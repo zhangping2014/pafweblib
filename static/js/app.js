@@ -3,6 +3,11 @@
  * @Author: xujia(2014-02-27 21:41)
  */
 !function(){
+    // 左侧树型面板
+    var pageTreePanel =  null;
+    // 页面标签面板
+    var pageTabPanel = null;
+
     /*
      * 定义平安付web系统类
      * */
@@ -50,17 +55,24 @@
             var me = this;
             me.pageTreePanel.on('itemclick', function(view, record, item, index, e){
                 me.loadPage.apply(me, arguments);
-                // todo 判断是否已存在该tab
                 e.stopEvent();
             });
         },
         loadPage: function(view, record, item, index){
-            var me = this, data = record.raw , id = "paf-" + data.id, pageTabPanel = me.pageTabPanel,
+            var me = this, data = record.raw ,
+                cbxTabs = Ext.getCmp('cbxTabs'), isTabs = cbxTabs.getValue(),
+                id = "paf-" + data.id, pageTabPanel = me.pageTabPanel,
                 tabPanel = pageTabPanel.getComponent(id), url = window.location.href.split('#')[0];
             window.location.href = url + '#' + data.id;
+
+            // 判断是否已存在该tab
             if(tabPanel){
                 pageTabPanel.setActiveTab(tabPanel);
             }else{
+                // 启用标签浏览
+                if(data.leaf && !isTabs){
+                    pageTabPanel.removeAll();
+                }
                 if(data.leaf){
                     var tmpPanel = Ext.create('Ext.panel.Panel',{
                         id: id,
@@ -95,39 +107,34 @@
                     }
                 }),
                 bodyStyle:'background:#f3f3f3',
-                tbar: [{
-                    width: 100,
-                    xtype: 'textfield',
-                    name: 'keyword',
-                    bodyStyle: {
-                        background: '#ffc',
-                        padding: '10px'
-                    },
-                    allowBlank: false  // requires a non-empty value
-                }, '->', {
-                    iconCls: 'icon-expand-all',
-                    tooltip: 'Expand All',
-                    handler: function(){
-                        this.root.expand(true);
-                    },
-                    scope: this
-                }, '-', {
-                    iconCls: 'icon-collapse-all',
-                    tooltip: 'Collapse All',
-                    handler: function(){
-                        this.root.collapse(true);
-                    },
-                    scope: this
-                }],
+                tbar: [
+                    Ext.create("FilterTextField"),
+                        '->', {
+                        iconCls: 'icon-expand-all',
+                        tooltip: 'Expand All',
+                        handler: function(){
+                            this.expandAll();
+                        },
+                        scope: this
+                    }, '-', {
+                        iconCls: 'icon-collapse-all',
+                        tooltip: 'Collapse All',
+                        handler: function(){
+                            this.collapseAll();
+                        },
+                        scope: this
+                    }
+                ],
                 bbar: [' ', new Ext.form.Checkbox({
-                    id: 'cbxTabs',
-                    checked: true,
-                    bodyStyle: {
-                        background: '#ffc',
-                        padding: '10px'
-                    },
-                    boxLabel: '启用标签浏览'
-                })],
+                        id: 'cbxTabs',
+                        checked: true,
+                        bodyStyle: {
+                            background: '#ffc',
+                            padding: '10px'
+                        },
+                        boxLabel: '启用标签浏览'
+                    })
+                ],
                 rootVisible: false,
                 border: false,
                 autoScroll: true,
@@ -141,6 +148,12 @@
         initComponent: function(){
             this.hiddenPkgs = [];
             this.callParent();
+        },
+        /*
+         * 关键字过滤树结构
+         */
+        fiterTree: function(){
+
         }
     });
 
@@ -162,45 +175,42 @@
                 tabWidth: 135,
                 bodyBorder: false
             }]);
-        },
-        /*
-         * 初始化组件
-         */
-        initComponent: function(){
-            this.callParent();
         }
     });
 
     /*
-     * 扩展过滤框
+     * 过滤输入框类
      */
-    Ext.define("PageFilterField", {
-        extend: Ext.form.TriggerFiled
-    });
-
-    PafWebLib.FilterField = Ext.extend(Ext.form.TriggerField, {
-        initComponent: function(){
-            Ext.app.FilterField.superclass.initComponent.call(this);
+    Ext.define('FilterTextField', {
+        extend: 'Ext.form.field.Text',
+        constructor: function(){
+            this.callParent({
+                width: 100,
+                name: 'filterTextField',
+                emptyText:'可过滤节点',
+                bodyStyle: {
+                    background: '#ffc',
+                    padding: '10px'
+                }
+            });
         },
-        triggerClass: 'x-form-clear-trigger',
-        hideTrigger: true,
-        validationEvent: false,
-        validateOnBlur: false,
-
-        onTriggerClick: function(){
-            this.el.dom.value = '';
-            this.trigger.hide();
-            this.focus();
-            this.fireEvent('keydown', this);
+        listeners: {
+            keydown: {
+                element: 'el', //bind to the underlying el property on the panel
+                fn: function(e, target){
+                    if(!pageTreePanel){
+                        return false;
+                    }
+                }
+            }
         }
     });
 
-
     Ext.onReady(function () {
         // 初始化左侧树型面板
-        var pageTreePanel =  Ext.create('pageTreePanel');
+        pageTreePanel =  Ext.create('pageTreePanel');
         // 初始化页面标签面板
-        var pageTabPanel = Ext.create('PageTabPanel');
+        pageTabPanel = Ext.create('PageTabPanel');
         // 初始化平安付web系统
         var pafWebLibSys = Ext.create('PafWebLibSys', {
             pageTreePanel: pageTreePanel,
