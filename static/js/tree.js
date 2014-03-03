@@ -10,3 +10,18 @@ PafWebLib.TREEDATA = [
         { id:"css.grid", text: "grid", "url" : "docs/css/css.grid.html", leaf: true}
     ]}
 ];
+PafWebLib.TREEDATA.getUrl = function(id){
+    var res = null;
+    (function(data){
+        for(var i = 0, len = data.length; i < len; i++){
+            var tmp = data[i];
+            if(tmp.id == id){
+                res = tmp;
+                return;
+            }else if(tmp.children){
+                arguments.callee(tmp.children);
+            }
+        }
+    })(PafWebLib.TREEDATA);
+    return res;
+}
