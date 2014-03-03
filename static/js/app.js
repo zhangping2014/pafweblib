@@ -60,7 +60,8 @@
         bindEvents: function(){
             var me = this;
             me.pageTreePanel.on('itemclick', function(view, record, item, index, e){
-                me.loadPage.apply(me, data);
+                var data = record.raw;
+                me.loadPage.apply(me, [data]);
                 e.stopEvent();
             });
         },
