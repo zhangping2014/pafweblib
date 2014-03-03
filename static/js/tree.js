@@ -8,6 +8,19 @@ PafWebLib.TREEDATA = [
     { "id": "css", "text": "CSS", expanded: false, children: [
         { id:"css.reset", text: "reset", "url" : "docs/css/css.reset.html", leaf: true },
         { id:"css.grid", text: "grid", "url" : "docs/css/css.grid.html", leaf: true}
+    ]},
+    { "id": "js", "text": "JS", expanded: false, children: [
+        { id:"js.global", text: "global", "url" : "docs/js/js.global.html", leaf: true }
+    ]},
+    { "id": "widget", "text": "Widget", expanded: false, children: [
+    ]},
+    { "id": "snippets", "text": "Snippets", expanded: false, children: [
+    ]},
+    { "id": "snippets", "text": "Snippets", expanded: false, children: [
+    ]},
+    { "id": "tools", "text": "Tools", expanded: false, children: [
+    ]},
+    { "id": "rules", "text": "Rules", expanded: false, children: [
     ]}
 ];
 PafWebLib.TREEDATA.getUrl = function(id){
