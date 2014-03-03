@@ -6,7 +6,9 @@ body{margin: 0; padding: 0; background-color: #f4f4f4; }
 .g-memo h2 { font-size: 18px; color: #e76300; font-weight: bold; }
 .g-memo h3 { margin-top: 8px; font-weight: bold; }
 .g-memo .update-histroy li { padding-left: 16px; }
-
+.g-memo .emp{
+    color: #e76300;
+}
 .g-detail { padding: 8px 8px 8px 16px; border-bottom: 1px dashed #ccc; }
 .g-detail h3 { margin: 16px 0 4px 0; color: #e76300; font-size: 14px; font-weight: bold; font-family: \5FAE\8F6F\96C5\9ED1; }
 .g-detail ul{text-indent:20px; }
